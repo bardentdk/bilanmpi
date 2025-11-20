@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -44,5 +45,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Relation avec les bilans MPI créés par l'utilisateur
+     */
+    public function bilansMpi()
+    {
+        return $this->hasMany(BilanMPI::class);
+    }
+
+    /**
+     * Vérifier si l'utilisateur est un administrateur
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Vérifier si l'utilisateur est un utilisateur standard
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
     }
 }

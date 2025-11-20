@@ -27,6 +27,9 @@ class BilanMPIController extends Controller
      */
     public function store(Request $request)
     {
+        // Vérifier l'autorisation
+        $this->authorize('create', BilanMPI::class);
+
         $validated = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
@@ -39,7 +42,7 @@ class BilanMPIController extends Controller
             // Générer le bilan avec l'IA Groq
             $bilanGenere = $this->groqService->generateBilanMPI($validated);
 
-            // Créer le bilan en base de données
+            // Créer le bilan en base de données avec l'user_id
             $bilan = BilanMPI::create([
                 'nom' => $validated['nom'],
                 'prenom' => $validated['prenom'],
@@ -47,6 +50,7 @@ class BilanMPIController extends Controller
                 'formateurs' => $validated['formateurs'],
                 'notes_brutes' => $validated['notes_brutes'],
                 'bilan_genere' => $bilanGenere,
+                'user_id' => auth()->id(), // Associer le bilan à l'utilisateur connecté
             ]);
 
             return redirect()->route('bilans-mpi.show', $bilan->id)
@@ -64,6 +68,9 @@ class BilanMPIController extends Controller
      */
     public function show(BilanMPI $bilanMpi)
     {
+        // Vérifier l'autorisation
+        $this->authorize('view', $bilanMpi);
+
         return Inertia::render('BilanMPI/Show', [
             'bilan' => $bilanMpi
         ]);
@@ -74,6 +81,9 @@ class BilanMPIController extends Controller
      */
     public function edit(BilanMPI $bilanMpi)
     {
+        // Vérifier l'autorisation
+        $this->authorize('update', $bilanMpi);
+
         return Inertia::render('BilanMPI/Edit', [
             'bilan' => $bilanMpi
         ]);
@@ -84,6 +94,9 @@ class BilanMPIController extends Controller
      */
     public function update(Request $request, BilanMPI $bilanMpi)
     {
+        // Vérifier l'autorisation
+        $this->authorize('update', $bilanMpi);
+
         $validated = $request->validate([
             'nom_apprenant' => 'required|string',
             'formateurs' => 'required|string',
@@ -149,6 +162,9 @@ class BilanMPIController extends Controller
      */
     public function downloadPdf(BilanMPI $bilanMpi)
     {
+        // Vérifier l'autorisation
+        $this->authorize('view', $bilanMpi);
+
         $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilanMpi])
             ->setPaper('a4', 'portrait');
 
@@ -167,7 +183,14 @@ class BilanMPIController extends Controller
      */
     public function index()
     {
-        $bilans = BilanMPI::orderBy('created_at', 'desc')->paginate(20);
+        // Admin voit tous les bilans, utilisateur standard voit uniquement les siens
+        $query = BilanMPI::query();
+
+        if (!auth()->user()->isAdmin()) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $bilans = $query->orderBy('created_at', 'desc')->paginate(20);
 
         return Inertia::render('BilanMPI/Index', [
             'bilans' => $bilans
@@ -177,11 +200,13 @@ class BilanMPIController extends Controller
     /**
      * Supprimer un bilan
      */
-    public function destroy($id)
+    public function destroy(BilanMPI $bilanMpi)
     {
+        // Vérifier l'autorisation
+        $this->authorize('delete', $bilanMpi);
+
         try {
-            $bilan = BilanMPI::findOrFail($id);
-            $bilan->delete();
+            $bilanMpi->delete();
 
             return redirect()->route('bilans-mpi.index')
                 ->with('success', 'Bilan supprimé avec succès !');
