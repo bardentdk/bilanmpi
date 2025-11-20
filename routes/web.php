@@ -20,8 +20,7 @@ Route::get('/', function () {
 Route::prefix('bilans-mpi')->name('bilans-mpi.')->middleware(['auth'])->group(function () {
     Route::get('/', [BilanMPIController::class, 'index'])->name('index');
     Route::get('/create', [BilanMPIController::class, 'create'])->name('create');
-    // Rate limiting sur la création (10 générations par heure pour éviter l'abus de l'API Groq)
-    Route::post('/', [BilanMPIController::class, 'store'])->name('store')->middleware('throttle:10,60');
+    Route::post('/', [BilanMPIController::class, 'store'])->name('store');
     Route::get('/{bilanMpi}', [BilanMPIController::class, 'show'])->name('show');
     Route::get('/{bilanMpi}/edit', [BilanMPIController::class, 'edit'])->name('edit');
     Route::put('/{bilanMpi}', [BilanMPIController::class, 'update'])->name('update');
