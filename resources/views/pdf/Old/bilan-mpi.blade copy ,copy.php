@@ -5,7 +5,7 @@
     <title>Bilan MPI Phase 1 - {{ $bilan->nom_complet }}</title>
     <style>
         @page {
-            margin: 12mm 12mm 25mm 12mm;
+            margin: 12mm 12mm 20mm 12mm;
         }
         
         body {
@@ -13,7 +13,6 @@
             font-size: 9pt;
             line-height: 1.3;
             color: #000000;
-            padding-bottom: 20mm;
         }
         
         /* En-tête fixe */
@@ -182,41 +181,34 @@
             width: 15%;
         }
         
-        /* Footer professionnel - FIXE EN BAS */
+        /* Footer professionnel */
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 18mm;
-            background-color: white;
-            border-top: 0.5pt solid #CCCCCC;
-            z-index: 1000;
-        }
-        
-        .footer-content {
+            height: 15mm;
             text-align: center;
             font-size: 6pt;
             color: #666666;
-            line-height: 1.3;
-            padding-top: 2mm;
+            line-height: 1.2;
+            padding-top: 3mm;
+            border-top: 0.5pt solid #CCCCCC;
         }
         
-        .footer-content .footer-line {
-            margin: 0.5mm 0;
+        .footer .footer-line {
+            margin: 1px 0;
         }
         
-        .page-number {
+        .footer .page-number {
             position: absolute;
-            bottom: 2mm;
             right: 12mm;
+            top: 3mm;
             font-size: 7pt;
-            color: #666666;
         }
         
-        .page-number:after {
-            /* content: "Page " counter(page) " / 4"; */
-            content: "Page " counter(page);
+        .footer .page-number:after {
+            content: "Page " counter(page) " / 4";
         }
         
         /* Séparateur de ligne */
@@ -230,11 +222,9 @@
 <body>
     <!-- Footer automatique sur toutes les pages -->
     <div class="footer">
-        <div class="footer-content">
-            <div class="footer-line">CAB EXPERT - AUSTRALE FORMATION | 68 rue TESSAN SAINTE-CLOTILDE 97490 | Numéro SIRET: 91021832000026 | N° TVA: FR18910218320 |</div>
-            <div class="footer-line">Numéro de déclaration d'activité: 04973564797 (RÉUNION)</div>
-            <div class="footer-line">Cet enregistrement ne vaut pas l'agrément de l'État</div>
-        </div>
+        <div class="footer-line">CAB EXPERT - AUSTRALE FORMATION | 68 rue TESSAN SAINTE-CLOTILDE 97490 | Numéro SIRET: 91021832000026 | N° TVA: FR18910218320 |</div>
+        <div class="footer-line">Numéro de déclaration d'activité: 04973564797 (RÉUNION)</div>
+        <div class="footer-line">Cet enregistrement ne vaut pas l'agrément de l'État</div>
         <div class="page-number"></div>
     </div>
 
