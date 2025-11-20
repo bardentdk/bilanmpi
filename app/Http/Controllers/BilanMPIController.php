@@ -173,4 +173,23 @@ class BilanMPIController extends Controller
             'bilans' => $bilans
         ]);
     }
+
+    /**
+     * Supprimer un bilan
+     */
+    public function destroy($id)
+    {
+        try {
+            $bilan = BilanMPI::findOrFail($id);
+            $bilan->delete();
+
+            return redirect()->route('bilans-mpi.index')
+                ->with('success', 'Bilan supprimé avec succès !');
+
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Erreur lors de la suppression : ' . $e->getMessage()
+            ]);
+        }
+    }
 }
