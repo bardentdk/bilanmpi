@@ -147,7 +147,7 @@ const formatDate = (date) => {
                             </svg>
                             Modifier
                         </Link>
-                        <Link
+                        <!-- <Link
                             :href="route('bilans-mpi.create')"
                             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center"
                         >
@@ -155,7 +155,7 @@ const formatDate = (date) => {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Nouveau bilan
-                        </Link>
+                        </Link> -->
                         <a
                             :href="route('bilans-mpi.pdf', bilan.id)"
                             class="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg hover:from-red-700 hover:to-pink-700 transition flex items-center"
