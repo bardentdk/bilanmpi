@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Services;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class GroqService
+{
+    private string $apiKey;
+    private string $model;
+    private string $baseUrl = 'https://api.groq.com/openai/v1';
+
+    public function __construct()
+    {
+        $this->apiKey = config('services.groq.api_key');
+        $this->model = config('services.groq.model', 'llama-3.3-70b-versatile');
+    }
+
+    /**
+     * Réécrire le texte avec l'IA Groq
+     */
+    public function rewriteText(string $prompt, string $context = ''): string
+    {
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->post($this->baseUrl . '/chat/completions', [
+                'model' => $this->model,
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => 'Tu es un assistant expert en rédaction de bilans de formation professionnelle. Tu dois reformuler les réponses de manière claire, professionnelle et structurée tout en conservant le sens et les informations importantes.'
+                    ],
+                    [
+                        'role' => 'user',
+                        'content' => $context . "\n\n" . $prompt
+                    ]
+                ],
+                'temperature' => 0.7,
+                'max_tokens' => 1000,
+            ]);
+
+            if ($response->successful()) {
+                return $response->json('choices.0.message.content');
+            }
+
+            Log::error('Groq API Error', [
+                'status' => $response->status(),
+                'body' => $response->body()
+            ]);
+
+            throw new \Exception('Erreur lors de la communication avec l\'API Groq');
+
+        } catch (\Exception $e) {
+            Log::error('Groq Service Exception', ['message' => $e->getMessage()]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Générer un bilan complet de formation
+     */
+    public function generateBilan(array $formData): array
+    {
+        $rewrittenData = [];
+
+        foreach ($formData as $key => $value) {
+            if (empty($value) || !is_string($value)) {
+                $rewrittenData[$key] = $value;
+                continue;
+            }
+
+            $prompt = "Reformule cette réponse de bilan de formation de manière professionnelle :\n\n$value";
+            $rewrittenData[$key] = $this->rewriteText($prompt);
+        }
+
+        return $rewrittenData;
+    }
+}
