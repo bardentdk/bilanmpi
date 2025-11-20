@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 
@@ -57,15 +59,29 @@ class UserController extends Controller
             'role' => 'required|in:admin,user',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $validated['role'],
-        ]);
+        try {
+            // Garder le mot de passe en clair pour l'email
+            $plainPassword = $validated['password'];
 
-        return redirect()->route('users.index')
-            ->with('success', 'Utilisateur créé avec succès !');
+            // Créer l'utilisateur
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($plainPassword),
+                'role' => $validated['role'],
+            ]);
+
+            // Envoyer l'email de bienvenue
+            Mail::to($user->email)->send(new WelcomeUser($user, $plainPassword));
+
+            return redirect()->route('users.index')
+                ->with('success', 'Utilisateur créé avec succès ! Un email de bienvenue a été envoyé.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'error' => 'Erreur lors de la création de l\'utilisateur : ' . $e->getMessage()
+            ])->withInput();
+        }
     }
 
     /**

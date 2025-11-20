@@ -12,9 +12,10 @@ Ce projet a été sécurisé avec les améliorations critiques suivantes :
 - **Admin** : Peut voir TOUS les bilans, gérer les utilisateurs
 - **User** : Peut voir uniquement SES bilans
 
-### ✅ Rate limiting
-- Maximum 10 générations de bilans par heure par utilisateur
-- Protection contre l'abus de l'API Groq
+### ✅ Email automatique
+- Email de bienvenue envoyé automatiquement à chaque nouvel utilisateur
+- Template professionnel avec identifiants de connexion
+- Intégration Brevo (300 emails/jour gratuits)
 
 ### ✅ Soft deletes
 - Les bilans supprimés peuvent être restaurés
@@ -36,7 +37,9 @@ Cette commande va créer les nouvelles colonnes :
 
 ### 2. Configurer les variables d'environnement
 
-Copiez les nouvelles variables de `.env.example` vers votre `.env` :
+#### A. Configuration Groq API
+
+Copiez les variables Groq de `.env.example` vers votre `.env` :
 
 ```bash
 # Configuration Groq API
@@ -45,6 +48,27 @@ GROQ_MODEL=llama-3.3-70b-versatile
 ```
 
 **Important** : Obtenez votre clé API sur https://console.groq.com/keys
+
+#### B. Configuration Email Brevo (pour les emails de bienvenue)
+
+1. **Créez un compte gratuit sur Brevo** : https://www.brevo.com/fr/
+2. **Obtenez vos identifiants SMTP** : https://app.brevo.com/settings/keys/smtp
+3. **Configurez votre `.env`** :
+
+```bash
+MAIL_MAILER=smtp
+MAIL_HOST=smtp-relay.brevo.com
+MAIL_PORT=587
+MAIL_USERNAME=votre_email_brevo
+MAIL_PASSWORD=votre_clé_smtp_brevo
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@australeformation.re"
+MAIL_FROM_NAME="Australe Formation CFA"
+```
+
+**💡 Astuce** : En développement local, utilisez `MAIL_MAILER=log` pour voir les emails dans les logs Laravel au lieu de les envoyer réellement.
+
+**Note** : Brevo offre 300 emails/jour gratuitement, largement suffisant pour vos besoins.
 
 ### 3. Créer le premier compte administrateur
 
@@ -116,6 +140,72 @@ Si vous voulez assigner les bilans à différents utilisateurs selon le CIP, cr�
 
 ---
 
+## 📧 Système d'emails de bienvenue
+
+### Fonctionnement automatique
+
+Lorsqu'un administrateur crée un nouvel utilisateur :
+
+1. **Un email de bienvenue est automatiquement envoyé** contenant :
+   - Les identifiants de connexion (email + mot de passe)
+   - Un lien direct vers la plateforme
+   - Les fonctionnalités disponibles
+   - Un rappel de changer le mot de passe
+
+2. **Le template d'email** est professionnel et aux couleurs d'Australe Formation CFA
+
+3. **Confirmation pour l'admin** : Un message de succès confirme l'envoi de l'email
+
+### Aperçu de l'email
+
+```
+┌─────────────────────────────────────────┐
+│  🎓 BilanMPI                            │
+│  Australe Formation CFA                 │
+├─────────────────────────────────────────┤
+│  Bonjour [Nom] 👋                       │
+│                                         │
+│  Votre compte a été créé !              │
+│                                         │
+│  🔐 Vos identifiants :                  │
+│  Email: user@example.com                │
+│  Mot de passe: ********                 │
+│                                         │
+│  [Se connecter à BilanMPI]              │
+│                                         │
+│  ⚠️ Changez votre mot de passe dès      │
+│     votre première connexion            │
+└─────────────────────────────────────────┘
+```
+
+### Test en développement
+
+Pour tester sans envoyer de vrais emails :
+
+```bash
+# Dans votre .env
+MAIL_MAILER=log
+```
+
+Les emails seront visibles dans `storage/logs/laravel.log`
+
+### Dépannage emails
+
+**Les emails ne sont pas envoyés ?**
+1. Vérifiez vos credentials Brevo dans `.env`
+2. Vérifiez les logs : `tail -f storage/logs/laravel.log`
+3. Testez l'envoi manuel :
+```bash
+php artisan tinker
+Mail::raw('Test', fn($msg) => $msg->to('test@example.com')->subject('Test'));
+```
+
+**Emails en spam ?**
+- Configurez SPF/DKIM dans Brevo
+- Utilisez un domaine vérifié
+
+---
+
 ## 🔧 Dépannage
 
 ### Erreur "Policy not found"
@@ -151,18 +241,22 @@ $user->save();
 - `app/Models/User.php` - Ajout du système de rôles
 - `app/Models/BilanMPI.php` - Ajout relation user et soft deletes
 - `app/Http/Controllers/BilanMPIController.php` - Ajout autorisations
-- `routes/web.php` - Ajout middleware auth et rate limiting
+- `app/Http/Controllers/UserController.php` - Ajout envoi email de bienvenue
+- `routes/web.php` - Ajout middleware auth
 - `resources/js/Layouts/AuthenticatedLayout.vue` - Ajout menu Gestion utilisateurs
+- `.env.example` - Ajout configuration Brevo
 
 ### Fichiers créés
 - `database/migrations/2025_11_20_051517_add_role_to_users_table.php`
 - `database/migrations/2025_11_20_051518_add_user_id_and_soft_deletes_to_bilans_mpi_table.php`
 - `app/Policies/BilanMPIPolicy.php`
 - `app/Http/Controllers/UserController.php`
+- `app/Mail/WelcomeUser.php`
 - `database/seeders/AdminUserSeeder.php`
 - `resources/js/Pages/Users/Index.vue`
 - `resources/js/Pages/Users/Create.vue`
 - `resources/js/Pages/Users/Edit.vue`
+- `resources/views/emails/welcome-user.blade.php`
 
 ---
 
