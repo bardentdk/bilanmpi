@@ -242,8 +242,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="logo-placeholder">Logo Région</div>
-                <div class="logo-placeholder">Logo Investir</div>
+                <img src="{{ public_path('images/logo-region-reunion.png') }}" style="height: 120px; margin-bottom: 5px;" alt="Région Réunion">
             </div>
         </div>
     </div>
@@ -303,8 +302,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="logo-placeholder">Logo Région</div>
-                <div class="logo-placeholder">Logo Investir</div>
+                <img src="{{ public_path('images/logo-region-reunion.png') }}" style="height: 120px; margin-bottom: 5px;" alt="Région Réunion">
             </div>
         </div>
     </div>
@@ -367,8 +365,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="logo-placeholder">Logo Région</div>
-                <div class="logo-placeholder">Logo Investir</div>
+                <img src="{{ public_path('images/logo-region-reunion.png') }}" style="height: 120px; margin-bottom: 5px;" alt="Région Réunion">
             </div>
         </div>
     </div>
@@ -437,8 +434,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="logo-placeholder">Logo Région</div>
-                <div class="logo-placeholder">Logo Investir</div>
+                <img src="{{ public_path('images/logo-region-reunion.png') }}" style="height: 120px; margin-bottom: 5px;" alt="Région Réunion">
             </div>
         </div>
     </div>
