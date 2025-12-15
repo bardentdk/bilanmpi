@@ -293,9 +293,9 @@ class BilanMPIController extends Controller
         // Admin voit tous les bilans, utilisateur standard voit uniquement les siens
         $query = BilanMPI::query();
 
-        if (!auth()->user()->isAdmin()) {
-            $query->where('user_id', auth()->id());
-        }
+        // if (!auth()->user()->isAdmin()) {
+        //     $query->where('user_id', auth()->id());
+        // }
 
         $bilans = $query->orderBy('created_at', 'desc')->paginate(20);
 
