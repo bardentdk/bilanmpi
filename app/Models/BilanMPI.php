@@ -19,6 +19,9 @@ class BilanMPI extends Model
         'notes_brutes',
         'bilan_genere',
         'user_id',
+        'impact_efficacite',
+        'impact_marche_travail',
+        'impact_insertion_sociale',
     ];
 
     protected $casts = [

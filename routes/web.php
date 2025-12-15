@@ -16,8 +16,8 @@ Route::get('/', function () {
     return redirect()->route('bilans-mpi.index');
 });
 
-// Routes des bilans MPI - Protégées par authentification
-Route::prefix('bilans-mpi')->name('bilans-mpi.')->middleware(['auth'])->group(function () {
+// Routes publiques (sans authentification)
+Route::prefix('bilans-mpi')->name('bilans-mpi.')->group(function () {
     Route::get('/', [BilanMPIController::class, 'index'])->name('index');
     Route::get('/create', [BilanMPIController::class, 'create'])->name('create');
     Route::post('/', [BilanMPIController::class, 'store'])->name('store');
@@ -25,8 +25,22 @@ Route::prefix('bilans-mpi')->name('bilans-mpi.')->middleware(['auth'])->group(fu
     Route::get('/{bilanMpi}/edit', [BilanMPIController::class, 'edit'])->name('edit');
     Route::put('/{bilanMpi}', [BilanMPIController::class, 'update'])->name('update');
     Route::get('/{bilanMpi}/pdf', [BilanMPIController::class, 'downloadPdf'])->name('pdf');
-    Route::delete('/{bilanMpi}', [BilanMPIController::class, 'destroy'])->name('destroy');
 });
+// Route::get('/', function () {
+//     return redirect()->route('bilans-mpi.index');
+// });
+
+// // Routes des bilans MPI - Protégées par authentification
+// Route::prefix('bilans-mpi')->name('bilans-mpi.')->middleware(['auth'])->group(function () {
+//     Route::get('/', [BilanMPIController::class, 'index'])->name('index');
+//     Route::get('/create', [BilanMPIController::class, 'create'])->name('create');
+//     Route::post('/', [BilanMPIController::class, 'store'])->name('store');
+//     Route::get('/{bilanMpi}', [BilanMPIController::class, 'show'])->name('show');
+//     Route::get('/{bilanMpi}/edit', [BilanMPIController::class, 'edit'])->name('edit');
+//     Route::put('/{bilanMpi}', [BilanMPIController::class, 'update'])->name('update');
+//     Route::get('/{bilanMpi}/pdf', [BilanMPIController::class, 'downloadPdf'])->name('pdf');
+//     Route::delete('/{bilanMpi}', [BilanMPIController::class, 'destroy'])->name('destroy');
+// });
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

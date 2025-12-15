@@ -380,8 +380,6 @@
         </div>
     </div>
 
-    <!-- Remplacer le tableau d'impact existant par celui-ci -->
-
     <div class="question-block" style="margin-top: 8px;">
         <div class="question-title">Impact de la formation sur l'apprenant</div>
         <table class="impact-table">
@@ -397,24 +395,24 @@
             <tbody>
                 <tr>
                     <td>Ce dispositif a t-il accru son efficacité ?</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_efficacite === 'pas_du_tout' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_efficacite === 'moyennement' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_efficacite === 'beaucoup' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_efficacite === 'au_dela' ? '✓' : '' }}</td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
                 </tr>
                 <tr>
                     <td>Ce dispositif a t-il accru sa valeur sur le marché du travail (interne ou externe) ?</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_marche_travail === 'pas_du_tout' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_marche_travail === 'moyennement' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_marche_travail === 'beaucoup' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_marche_travail === 'au_dela' ? '✓' : '' }}</td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
                 </tr>
                 <tr>
                     <td>Ce dispositif a-t-il permis une meilleure insertion sociale ?</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_insertion_sociale === 'pas_du_tout' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_insertion_sociale === 'moyennement' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_insertion_sociale === 'beaucoup' ? '✓' : '' }}</td>
-                    <td class="checkbox-cell">{{ $bilan->impact_insertion_sociale === 'au_dela' ? '✓' : '' }}</td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
+                    <td class="checkbox-cell"></td>
                 </tr>
             </tbody>
         </table>

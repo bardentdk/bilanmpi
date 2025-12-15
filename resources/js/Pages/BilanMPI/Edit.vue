@@ -26,6 +26,9 @@ const form = useForm({
     module_12: props.bilan.bilan_genere['Module 12'],
     module_13: props.bilan.bilan_genere['Module 13'],
     arret: props.bilan.bilan_genere.Arrêt,
+    impact_efficacite: props.bilan.impact_efficacite || null,
+    impact_marche_travail: props.bilan.impact_marche_travail || null,
+    impact_insertion_sociale: props.bilan.impact_insertion_sociale || null,
 });
 
 const moduleLabels = [
@@ -165,6 +168,155 @@ const submit = () => {
                     </div>
                 </div>
 
+                <!-- Tableau d'impact de la formation -->
+                <div class="bg-white rounded-xl shadow-xl p-6">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800">Impact de la Formation</h2>
+                    </div>
+
+                    <div class="space-y-6">
+                        <!-- Efficacité -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-800 mb-3">
+                                Ce dispositif a-t-il accru son efficacité ?
+                            </label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_efficacite"
+                                        value="pas_du_tout"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Pas du tout</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_efficacite"
+                                        value="moyennement"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Moyennement</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_efficacite"
+                                        value="beaucoup"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Beaucoup</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_efficacite"
+                                        value="au_dela"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Au-delà des attentes</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Marché du travail -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-800 mb-3">
+                                Ce dispositif a-t-il accru sa valeur sur le marché du travail ?
+                            </label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_marche_travail"
+                                        value="pas_du_tout"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Pas du tout</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_marche_travail"
+                                        value="moyennement"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Moyennement</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_marche_travail"
+                                        value="beaucoup"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Beaucoup</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_marche_travail"
+                                        value="au_dela"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Au-delà des attentes</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Insertion sociale -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <label class="block text-sm font-semibold text-gray-800 mb-3">
+                                Ce dispositif a-t-il permis une meilleure insertion sociale ?
+                            </label>
+                            <div class="flex flex-wrap gap-3">
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_insertion_sociale"
+                                        value="pas_du_tout"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Pas du tout</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_insertion_sociale"
+                                        value="moyennement"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Moyennement</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_insertion_sociale"
+                                        value="beaucoup"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Beaucoup</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        v-model="form.impact_insertion_sociale"
+                                        value="au_dela"
+                                        class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span class="ml-2 text-sm text-gray-700">Au-delà des attentes</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Arrêt -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -179,7 +331,7 @@ const submit = () => {
                 </div>
 
                 <!-- Boutons d'action -->
-                <div class="bg-white rounded-xl shadow-lg p-6 sticky bottom-0 ">
+                <div class="bg-white rounded-xl shadow-lg p-6">
                     <div class="flex items-center justify-between">
                         <a
                             :href="route('bilans-mpi.show', bilan.id)"
