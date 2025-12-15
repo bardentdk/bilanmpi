@@ -25,6 +25,7 @@ Route::prefix('bilans-mpi')->name('bilans-mpi.')->group(function () {
     Route::get('/{bilanMpi}/edit', [BilanMPIController::class, 'edit'])->name('edit');
     Route::put('/{bilanMpi}', [BilanMPIController::class, 'update'])->name('update');
     Route::get('/{bilanMpi}/pdf', [BilanMPIController::class, 'downloadPdf'])->name('pdf');
+    Route::delete('/{bilanMpi}', [BilanMPIController::class, 'destroy'])->name('destroy');
 });
 // Route::get('/', function () {
 //     return redirect()->route('bilans-mpi.index');
