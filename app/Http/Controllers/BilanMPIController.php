@@ -288,22 +288,49 @@ class BilanMPIController extends Controller
     /**
      * Liste des bilans
      */
-    public function index()
+    // public function index()
+    // {
+    //     // Admin voit tous les bilans, utilisateur standard voit uniquement les siens
+    //     $query = BilanMPI::query();
+
+    //     // if (!auth()->user()->isAdmin()) {
+    //     //     $query->where('user_id', auth()->id());
+    //     // }
+
+    //     $bilans = $query->orderBy('created_at', 'desc')->paginate(20);
+
+    //     return Inertia::render('BilanMPI/Index', [
+    //         'bilans' => $bilans
+    //     ]);
+    // }
+    /**
+     * Liste des bilans avec recherche
+     */
+    public function index(Request $request)
     {
-        // Admin voit tous les bilans, utilisateur standard voit uniquement les siens
-        $query = BilanMPI::query();
-
-        // if (!auth()->user()->isAdmin()) {
-        //     $query->where('user_id', auth()->id());
-        // }
-
-        $bilans = $query->orderBy('created_at', 'desc')->paginate(20);
+        $search = $request->input('search');
+        
+        $bilans = BilanMPI::query()
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nom', 'like', "%{$search}%")
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('cip', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
+                    ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(20)
+            ->withQueryString(); // Important pour garder la recherche dans la pagination
 
         return Inertia::render('BilanMPI/Index', [
-            'bilans' => $bilans
+            'bilans' => $bilans,
+            'filters' => [
+                'search' => $search,
+            ],
         ]);
     }
-
     /**
      * Supprimer un bilan
      */

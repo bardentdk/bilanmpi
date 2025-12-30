@@ -1,15 +1,14 @@
 <script setup>
 import { Link, router } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
-import { debounce } from 'lodash';
 
 const props = defineProps({
-    bilans: Object,
-    filters: Object,
+    bilans: Object
 });
-
-const search = ref(props.filters.search || '');
-
+const deleteBilan = (id) => {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce bilan ?')) {
+        router.delete(`/bilans-mpi/${id}`)
+    }
+}
 const formatDate = (date) => {
     return new Date(date).toLocaleDateString('fr-FR', {
         year: 'numeric',
@@ -19,22 +18,6 @@ const formatDate = (date) => {
         minute: '2-digit'
     });
 };
-
-// Recherche avec debounce pour éviter trop de requêtes
-const performSearch = debounce(() => {
-    router.get(route('bilans-mpi.index'), { search: search.value }, {
-        preserveState: true,
-        preserveScroll: true,
-    });
-}, 300);
-
-watch(search, () => {
-    performSearch();
-});
-
-const clearSearch = () => {
-    search.value = '';
-};
 </script>
 
 <template>
@@ -42,7 +25,7 @@ const clearSearch = () => {
         <div class="max-w-7xl mx-auto">
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex flex-col gap-y-10 sm:gap-none sm:flex-row ml:flex-row xl:flex-row items-start sm:items-center justify-between">
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 mb-2">
                             Bilans MPI Phase 1
@@ -51,54 +34,18 @@ const clearSearch = () => {
                             Dispositif Mobilisation vers la Professionnalisation et l'Insertion
                         </p>
                         <p class="text-sm text-gray-500 mt-1">
-                            {{ bilans.total }} bilan(s) • Australe Formation CFA
+                            {{ bilans.total }} bilan(s) généré(s) • Australe Formation CFA
                         </p>
                     </div>
                     <Link
                         :href="route('bilans-mpi.create')"
-                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center"
+                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center"
                     >
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Nouveau Bilan
                     </Link>
-                </div>
-
-                <!-- Barre de recherche -->
-                <div class="mt-6">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </div>
-                        <input
-                            v-model="search"
-                            type="text"
-                            placeholder="Rechercher par nom, prénom ou CIP..."
-                            class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                        />
-                        <button
-                            v-if="search"
-                            @click="clearSearch"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center"
-                        >
-                            <svg class="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Indicateur de résultats -->
-                    <div v-if="search" class="mt-2 text-sm text-gray-600">
-                        <span v-if="bilans.total > 0">
-                            {{ bilans.total }} résultat(s) pour "<strong>{{ search }}</strong>"
-                        </span>
-                        <span v-else class="text-orange-600">
-                            Aucun résultat pour "<strong>{{ search }}</strong>"
-                        </span>
-                    </div>
                 </div>
             </div>
 
@@ -107,10 +54,10 @@ const clearSearch = () => {
                 <div 
                     v-for="bilan in bilans.data" 
                     :key="bilan.id"
-                    class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 overflow-hidden"
+                    class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-200 overflow-hidden "
                 >
                     <div class="p-6">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 ">
                             <div class="flex-1">
                                 <div class="flex items-center mb-2">
                                     <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center mr-4">
@@ -164,6 +111,12 @@ const clearSearch = () => {
                                     </svg>
                                     PDF
                                 </a>
+                                <button @click="deleteBilan(bilan.id)"
+                                        class="text-red-600 hover:text-red-800">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -171,18 +124,17 @@ const clearSearch = () => {
             </div>
 
             <!-- Message si aucun bilan -->
-            <div v-else class="bg-white rounded-xl shadow-lg p-12 text-center">
-                <svg class="w-20 h-20 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div v-else class="bg-white rounded-xl shadow-lg p-12 text-start sm:text-center ">
+                <svg class="w-20 h-20 mx-0 sm:mx-auto text-indigo-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">
-                    {{ search ? 'Aucun résultat trouvé' : 'Aucun bilan MPI généré' }}
+                    Aucun bilan MPI généré
                 </h3>
                 <p class="text-gray-500 mb-6">
-                    {{ search ? 'Essayez avec d\'autres termes de recherche' : 'Commencez par créer votre premier bilan de Phase 1' }}
+                    Commencez par créer votre premier bilan de Phase 1
                 </p>
                 <Link
-                    v-if="!search"
                     :href="route('bilans-mpi.create')"
                     class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
                 >
@@ -191,16 +143,6 @@ const clearSearch = () => {
                     </svg>
                     Créer un bilan
                 </Link>
-                <button
-                    v-else
-                    @click="clearSearch"
-                    class="inline-flex items-center px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition-all"
-                >
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Effacer la recherche
-                </button>
             </div>
 
             <!-- Pagination -->
@@ -209,12 +151,9 @@ const clearSearch = () => {
                     <Link
                         v-if="bilans.prev_page_url"
                         :href="bilans.prev_page_url"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                     >
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Précédent
+                        ← Précédent
                     </Link>
                     <span class="text-sm text-gray-600">
                         Page {{ bilans.current_page }} sur {{ bilans.last_page }}
@@ -222,12 +161,9 @@ const clearSearch = () => {
                     <Link
                         v-if="bilans.next_page_url"
                         :href="bilans.next_page_url"
-                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center"
+                        class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                     >
-                        Suivant
-                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
+                        Suivant →
                     </Link>
                 </div>
             </div>
