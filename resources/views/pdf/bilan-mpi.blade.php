@@ -465,7 +465,7 @@
         <div class="question-title">Autres remarques</div>
         <hr>
         <div class="question-content">
-            Document généré automatiquement le {{ $bilan->created_at->format('d/m/Y à H:i') }}
+            <!-- Document généré automatiquement le {{ $bilan->created_at->format('d/m/Y à H:i') }} -->
         </div>
     </div>
 
