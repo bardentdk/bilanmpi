@@ -267,19 +267,34 @@ class BilanMPIController extends Controller
     /**
      * Télécharger le PDF
      */
+    
+    // public function downloadPdf(BilanMPI $bilanMpi)
+    // {
+    //     // Vérifier l'autorisation
+    //     // $this->authorize('view', $bilanMpi);
+
+    //     $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilanMpi])
+    //         ->setPaper('a4', 'portrait');
+
+    //     $filename = sprintf(
+    //         'bilan_mpi_phase1_%s_%s_%s.pdf',
+    //         strtolower($bilanMpi->nom),
+    //         strtolower($bilanMpi->prenom),
+    //         $bilanMpi->created_at->format('Y-m-d')
+    //     );
+
+    //     return $pdf->download($filename);
+    // }
     public function downloadPdf(BilanMPI $bilanMpi)
     {
-        // Vérifier l'autorisation
-        // $this->authorize('view', $bilanMpi);
-
         $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilanMpi])
             ->setPaper('a4', 'portrait');
 
+        // Format: DFP/2023/0814 - Bilan - NOM PRENOM.pdf
         $filename = sprintf(
-            'bilan_mpi_phase1_%s_%s_%s.pdf',
-            strtolower($bilanMpi->nom),
-            strtolower($bilanMpi->prenom),
-            $bilanMpi->created_at->format('Y-m-d')
+            'DFP-2023-0814 - Bilan - %s %s.pdf',
+            strtoupper($bilanMpi->nom),      // NOM en majuscules
+            ucfirst($bilanMpi->prenom)       // Prénom avec première lettre majuscule
         );
 
         return $pdf->download($filename);
