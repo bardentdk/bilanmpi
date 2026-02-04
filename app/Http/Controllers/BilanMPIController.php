@@ -321,50 +321,44 @@ class BilanMPIController extends Controller
     //     ]);
     // }
     /**
-     * Exporter tous les bilans en ZIP
+     * Exporter tous les bilans en ZIP (VERSION OPTIMISÉE)
      */
     public function exportAllPdf(Request $request)
     {
-        set_time_limit(300); // 5 minutes max pour éviter timeout
+        // Augmenter les limites
+        set_time_limit(600); // 10 minutes
+        ini_set('memory_limit', '512M'); // Plus de mémoire
         
         $search = $request->input('search');
         
-        // Récupérer les bilans (avec recherche si applicable)
-        $query = BilanMPI::query();
+        // Récupérer uniquement les IDs d'abord (beaucoup plus rapide)
+        $query = BilanMPI::query()->select('id', 'nom', 'prenom', 'created_at');
         
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-                  ->orWhere('cip', 'like', "%{$search}%")
-                  ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
-                  ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
+                ->orWhere('prenom', 'like', "%{$search}%")
+                ->orWhere('cip', 'like', "%{$search}%")
+                ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
+                ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
             });
         }
         
-        $bilans = $query->orderBy('created_at', 'desc')->get();
+        $bilanIds = $query->orderBy('created_at', 'desc')->limit(100)->pluck('id'); // MAX 100 bilans
         
-        // Vérifier qu'il y a des bilans
-        if ($bilans->isEmpty()) {
+        if ($bilanIds->isEmpty()) {
             return back()->with('error', 'Aucun bilan à exporter.');
         }
         
-        // Limiter à 200 bilans max pour éviter les problèmes de mémoire
-        if ($bilans->count() > 200) {
-            return back()->with('error', 'Trop de bilans à exporter (max 200). Veuillez utiliser la recherche pour filtrer.');
-        }
-        
-        // Créer un dossier temporaire
+        // Créer un dossier temporaire unique
         $tempPath = storage_path('app/temp');
         if (!file_exists($tempPath)) {
             mkdir($tempPath, 0755, true);
         }
         
-        // Nom du fichier ZIP
         $zipFileName = 'bilans_mpi_export_' . now()->format('Y-m-d_His') . '.zip';
         $zipFilePath = $tempPath . '/' . $zipFileName;
         
-        // Créer le ZIP
         $zip = new ZipArchive();
         
         if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -372,31 +366,44 @@ class BilanMPIController extends Controller
         }
         
         try {
-            // Générer chaque PDF et l'ajouter au ZIP
-            foreach ($bilans as $bilan) {
-                // Générer le PDF en mémoire
+            // Traiter les bilans UN PAR UN pour économiser la mémoire
+            foreach ($bilanIds as $index => $bilanId) {
+                // Charger uniquement ce bilan
+                $bilan = BilanMPI::find($bilanId);
+                
+                if (!$bilan) continue;
+                
+                // Générer le PDF
                 $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilan])
                     ->setPaper('a4', 'portrait');
                 
-                // Nom du fichier PDF
                 $pdfFileName = sprintf(
                     'DFP-2023-0814 - Bilan - %s %s.pdf',
                     strtoupper($bilan->nom),
                     ucfirst($bilan->prenom)
                 );
                 
-                // Ajouter le PDF au ZIP
+                // Ajouter au ZIP
                 $zip->addFromString($pdfFileName, $pdf->output());
+                
+                // Libérer la mémoire tous les 10 bilans
+                if (($index + 1) % 10 === 0) {
+                    gc_collect_cycles();
+                }
             }
             
             $zip->close();
             
-            // Télécharger le ZIP
+            // Télécharger et supprimer
             return response()->download($zipFilePath, $zipFileName)->deleteFileAfterSend(true);
             
         } catch (\Exception $e) {
-            $zip->close();
+            if ($zip) {
+                $zip->close();
+            }
             @unlink($zipFilePath);
+            
+            \Log::error('Export ZIP failed: ' . $e->getMessage());
             
             return back()->with('error', 'Erreur lors de la génération du ZIP : ' . $e->getMessage());
         }
