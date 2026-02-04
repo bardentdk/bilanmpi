@@ -7,6 +7,8 @@ use App\Services\GroqService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use ZipArchive;
+use Illuminate\Support\Facades\Storage;
 
 class BilanMPIController extends Controller
 {
@@ -318,6 +320,88 @@ class BilanMPIController extends Controller
     //         'bilans' => $bilans
     //     ]);
     // }
+    /**
+     * Exporter tous les bilans en ZIP
+     */
+    public function exportAllPdf(Request $request)
+    {
+        set_time_limit(300); // 5 minutes max pour éviter timeout
+        
+        $search = $request->input('search');
+        
+        // Récupérer les bilans (avec recherche si applicable)
+        $query = BilanMPI::query();
+        
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nom', 'like', "%{$search}%")
+                  ->orWhere('prenom', 'like', "%{$search}%")
+                  ->orWhere('cip', 'like', "%{$search}%")
+                  ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
+                  ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
+            });
+        }
+        
+        $bilans = $query->orderBy('created_at', 'desc')->get();
+        
+        // Vérifier qu'il y a des bilans
+        if ($bilans->isEmpty()) {
+            return back()->with('error', 'Aucun bilan à exporter.');
+        }
+        
+        // Limiter à 200 bilans max pour éviter les problèmes de mémoire
+        if ($bilans->count() > 200) {
+            return back()->with('error', 'Trop de bilans à exporter (max 200). Veuillez utiliser la recherche pour filtrer.');
+        }
+        
+        // Créer un dossier temporaire
+        $tempPath = storage_path('app/temp');
+        if (!file_exists($tempPath)) {
+            mkdir($tempPath, 0755, true);
+        }
+        
+        // Nom du fichier ZIP
+        $zipFileName = 'bilans_mpi_export_' . now()->format('Y-m-d_His') . '.zip';
+        $zipFilePath = $tempPath . '/' . $zipFileName;
+        
+        // Créer le ZIP
+        $zip = new ZipArchive();
+        
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return back()->with('error', 'Impossible de créer le fichier ZIP.');
+        }
+        
+        try {
+            // Générer chaque PDF et l'ajouter au ZIP
+            foreach ($bilans as $bilan) {
+                // Générer le PDF en mémoire
+                $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilan])
+                    ->setPaper('a4', 'portrait');
+                
+                // Nom du fichier PDF
+                $pdfFileName = sprintf(
+                    'DFP-2023-0814 - Bilan - %s %s.pdf',
+                    strtoupper($bilan->nom),
+                    ucfirst($bilan->prenom)
+                );
+                
+                // Ajouter le PDF au ZIP
+                $zip->addFromString($pdfFileName, $pdf->output());
+            }
+            
+            $zip->close();
+            
+            // Télécharger le ZIP
+            return response()->download($zipFilePath, $zipFileName)->deleteFileAfterSend(true);
+            
+        } catch (\Exception $e) {
+            $zip->close();
+            @unlink($zipFilePath);
+            
+            return back()->with('error', 'Erreur lors de la génération du ZIP : ' . $e->getMessage());
+        }
+    }
+
     /**
      * Liste des bilans avec recherche
      */

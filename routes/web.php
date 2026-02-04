@@ -26,6 +26,9 @@ Route::prefix('bilans-mpi')->name('bilans-mpi.')->group(function () {
     Route::put('/{bilanMpi}', [BilanMPIController::class, 'update'])->name('update');
     Route::get('/{bilanMpi}/pdf', [BilanMPIController::class, 'downloadPdf'])->name('pdf');
     Route::delete('/{bilanMpi}', [BilanMPIController::class, 'destroy'])->name('destroy');
+
+    // Nouvelle route pour l'export en masse
+    Route::get('/export/all', [BilanMPIController::class, 'exportAllPdf'])->name('export.all');
 });
 // Route::get('/', function () {
 //     return redirect()->route('bilans-mpi.index');
