@@ -202,7 +202,7 @@ const exportAllPdf = () => {
                                     </svg>
                                     Voir
                                 </Link>
-                                <a
+                                
                                     :href="route('bilans-mpi.pdf', bilan.id)"
                                     class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center justify-center"
                                 >
