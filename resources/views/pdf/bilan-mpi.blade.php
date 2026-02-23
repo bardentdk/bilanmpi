@@ -265,7 +265,7 @@
     <div class="formation-info">
         <div><span class="info-label">Action de formation :</span> MPI-{{ $bilan->bilan_genere['Nom de l\'apprenant'] }}</div>
         <div><span class="info-label">Lieu de la formation :</span> Australe Formation - Sainte-Clotilde</div>
-        <div><span class="info-label">Date de la formation :</span> du 9 octobre 2024 au 26 mars 2025</div>
+        <div><span class="info-label">Date du dispositif phase 1 :</span> du 16/10/2023 au 30/11/2025</div>
         <div><span class="info-label">Formateur(s) :</span></div>
         <ul>
             <li>{{ $bilan->bilan_genere['Formateurs'] }}</li>

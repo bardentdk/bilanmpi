@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 use ZipArchive;
-use Illuminate\Support\Facades\Storage;
 
 class BilanMPIController extends Controller
 {
@@ -27,46 +26,6 @@ class BilanMPIController extends Controller
     /**
      * Traiter le formulaire et générer le bilan
      */
-    // public function store(Request $request)
-    // {
-    //     // Vérifier l'autorisation
-    //     $this->authorize('create', BilanMPI::class);
-
-    //     $validated = $request->validate([
-    //         'nom' => 'required|string|max:255',
-    //         'prenom' => 'required|string|max:255',
-    //         'cip' => 'required|string|max:255',
-    //         'formateurs' => 'required|string',
-    //         'notes_brutes' => 'required|string|min:50',
-    //     ]);
-
-    //     try {
-    //         // Générer le bilan avec l'IA Groq
-    //         $bilanGenere = $this->groqService->generateBilanMPI($validated);
-
-    //         // Créer le bilan en base de données avec l'user_id
-    //         $bilan = BilanMPI::create([
-    //             'nom' => $validated['nom'],
-    //             'prenom' => $validated['prenom'],
-    //             'cip' => $validated['cip'],
-    //             'formateurs' => $validated['formateurs'],
-    //             'notes_brutes' => $validated['notes_brutes'],
-    //             'bilan_genere' => $bilanGenere,
-    //             'user_id' => auth()->id(), // Associer le bilan à l'utilisateur connecté
-    //         ]);
-
-    //         return redirect()->route('bilans-mpi.show', $bilan->id)
-    //             ->with('success', 'Bilan MPI Phase 1 généré avec succès !');
-
-    //     } catch (\Exception $e) {
-    //         return back()->withErrors([
-    //             'error' => 'Erreur lors de la génération du bilan : ' . $e->getMessage()
-    //         ])->withInput();
-    //     }
-    // }
-    /**
-     * Traiter le formulaire et générer le bilan
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -78,10 +37,8 @@ class BilanMPIController extends Controller
         ]);
 
         try {
-            // Générer le bilan avec l'IA Groq
             $bilanGenere = $this->groqService->generateBilanMPI($validated);
 
-            // Créer le bilan en base de données
             $bilan = BilanMPI::create([
                 'nom' => $validated['nom'],
                 'prenom' => $validated['prenom'],
@@ -106,9 +63,6 @@ class BilanMPIController extends Controller
      */
     public function show(BilanMPI $bilanMpi)
     {
-        // Vérifier l'autorisation
-        // $this->authorize('view', $bilanMpi);
-
         return Inertia::render('BilanMPI/Show', [
             'bilan' => $bilanMpi
         ]);
@@ -119,81 +73,10 @@ class BilanMPIController extends Controller
      */
     public function edit(BilanMPI $bilanMpi)
     {
-        // Vérifier l'autorisation
-        // $this->authorize('update', $bilanMpi);
-
         return Inertia::render('BilanMPI/Edit', [
             'bilan' => $bilanMpi
         ]);
     }
-
-    /**
-     * Mettre à jour le bilan v1
-     */
-    // public function update(Request $request, BilanMPI $bilanMpi)
-    // {
-    //     // Vérifier l'autorisation
-    //     $this->authorize('update', $bilanMpi);
-
-    //     $validated = $request->validate([
-    //         'nom_apprenant' => 'required|string',
-    //         'formateurs' => 'required|string',
-    //         'parcours' => 'required|string',
-    //         'conditions' => 'required|string',
-    //         'methodes' => 'required|string',
-    //         'module_1' => 'required|string',
-    //         'module_2' => 'required|string',
-    //         'module_3' => 'required|string',
-    //         'module_4' => 'required|string',
-    //         'module_5' => 'required|string',
-    //         'module_6' => 'required|string',
-    //         'module_7' => 'required|string',
-    //         'module_8' => 'required|string',
-    //         'module_9' => 'required|string',
-    //         'module_10' => 'required|string',
-    //         'module_11' => 'required|string',
-    //         'module_12' => 'required|string',
-    //         'module_13' => 'required|string',
-    //         'arret' => 'required|string',
-    //     ]);
-
-    //     try {
-    //         // Reconstruire le tableau bilan_genere avec les nouvelles données
-    //         $bilanGenereUpdated = [
-    //             'Nom de l\'apprenant' => $validated['nom_apprenant'],
-    //             'Formateurs' => $validated['formateurs'],
-    //             'Parcours' => $validated['parcours'],
-    //             'Conditions' => $validated['conditions'],
-    //             'Méthodes' => $validated['methodes'],
-    //             'Module 1' => $validated['module_1'],
-    //             'Module 2' => $validated['module_2'],
-    //             'Module 3' => $validated['module_3'],
-    //             'Module 4' => $validated['module_4'],
-    //             'Module 5' => $validated['module_5'],
-    //             'Module 6' => $validated['module_6'],
-    //             'Module 7' => $validated['module_7'],
-    //             'Module 8' => $validated['module_8'],
-    //             'Module 9' => $validated['module_9'],
-    //             'Module 10' => $validated['module_10'],
-    //             'Module 11' => $validated['module_11'],
-    //             'Module 12' => $validated['module_12'],
-    //             'Module 13' => $validated['module_13'],
-    //             'Arrêt' => $validated['arret'],
-    //         ];
-
-    //         $bilanMpi->update([
-    //             'bilan_genere' => $bilanGenereUpdated,
-    //         ]);
-
-    //         return redirect()->route('bilans-mpi.show', $bilanMpi->id)
-    //             ->with('success', 'Bilan modifié avec succès !');
-
-    //     } catch (\Exception $e) {
-    //         return back()->withErrors([
-    //             'error' => 'Erreur lors de la modification du bilan : ' . $e->getMessage()
-    //         ])->withInput();
-    //     }
-    // }
 
     /**
      * Mettre à jour le bilan
@@ -226,7 +109,6 @@ class BilanMPIController extends Controller
         ]);
 
         try {
-            // Reconstruire le tableau bilan_genere avec les nouvelles données
             $bilanGenereUpdated = [
                 'Nom de l\'apprenant' => $validated['nom_apprenant'],
                 'Formateurs' => $validated['formateurs'],
@@ -267,92 +149,46 @@ class BilanMPIController extends Controller
     }
 
     /**
-     * Télécharger le PDF
+     * Télécharger un PDF individuel
      */
-    
-    // public function downloadPdf(BilanMPI $bilanMpi)
-    // {
-    //     // Vérifier l'autorisation
-    //     // $this->authorize('view', $bilanMpi);
-
-    //     $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilanMpi])
-    //         ->setPaper('a4', 'portrait');
-
-    //     $filename = sprintf(
-    //         'bilan_mpi_phase1_%s_%s_%s.pdf',
-    //         strtolower($bilanMpi->nom),
-    //         strtolower($bilanMpi->prenom),
-    //         $bilanMpi->created_at->format('Y-m-d')
-    //     );
-
-    //     return $pdf->download($filename);
-    // }
     public function downloadPdf(BilanMPI $bilanMpi)
     {
         $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilanMpi])
             ->setPaper('a4', 'portrait');
 
-        // Format: DFP/2023/0814 - Bilan - NOM PRENOM.pdf
         $filename = sprintf(
             'DFP-2023-0814 - Bilan - %s %s.pdf',
-            strtoupper($bilanMpi->nom),      // NOM en majuscules
-            ucfirst($bilanMpi->prenom)       // Prénom avec première lettre majuscule
+            strtoupper($bilanMpi->nom),
+            ucfirst($bilanMpi->prenom)
         );
 
         return $pdf->download($filename);
     }
 
     /**
-     * Liste des bilans
+     * Exporter les bilans sélectionnés en ZIP
      */
-    // public function index()
-    // {
-    //     // Admin voit tous les bilans, utilisateur standard voit uniquement les siens
-    //     $query = BilanMPI::query();
-
-    //     // if (!auth()->user()->isAdmin()) {
-    //     //     $query->where('user_id', auth()->id());
-    //     // }
-
-    //     $bilans = $query->orderBy('created_at', 'desc')->paginate(20);
-
-    //     return Inertia::render('BilanMPI/Index', [
-    //         'bilans' => $bilans
-    //     ]);
-    // }
-    /**
-     * Exporter tous les bilans en ZIP
-     */
-    public function exportAllPdf(Request $request)
+    public function exportSelectedPdf(Request $request)
     {
-        set_time_limit(300); // 5 minutes max pour éviter timeout
+        set_time_limit(300);
+        ini_set('memory_limit', '512M');
         
-        $search = $request->input('search');
+        // DEBUG : Log pour voir ce qui arrive
+        \Log::info('Export request received', [
+            'bilan_ids_count' => count($request->input('bilan_ids', [])),
+            'bilan_ids' => $request->input('bilan_ids')
+        ]);
         
-        // Récupérer les bilans (avec recherche si applicable)
-        $query = BilanMPI::query();
+        $validated = $request->validate([
+            'bilan_ids' => 'required|array|min:1|max:50',
+            'bilan_ids.*' => 'required|integer|exists:bilans_mpi,id',
+        ]);
         
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-                  ->orWhere('cip', 'like', "%{$search}%")
-                  ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
-                  ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
-            });
-        }
+        \Log::info('After validation', [
+            'validated_count' => count($validated['bilan_ids'])
+        ]);
         
-        $bilans = $query->orderBy('created_at', 'desc')->get();
-        
-        // Vérifier qu'il y a des bilans
-        if ($bilans->isEmpty()) {
-            return back()->with('error', 'Aucun bilan à exporter.');
-        }
-        
-        // Limiter à 200 bilans max pour éviter les problèmes de mémoire
-        if ($bilans->count() > 200) {
-            return back()->with('error', 'Trop de bilans à exporter (max 200). Veuillez utiliser la recherche pour filtrer.');
-        }
+        $bilanIds = $validated['bilan_ids'];
         
         // Créer un dossier temporaire
         $tempPath = storage_path('app/temp');
@@ -360,50 +196,72 @@ class BilanMPIController extends Controller
             mkdir($tempPath, 0755, true);
         }
         
-        // Nom du fichier ZIP
-        $zipFileName = 'bilans_mpi_export_' . now()->format('Y-m-d_His') . '.zip';
+        $zipFileName = 'bilans_mpi_selection_' . now()->format('Y-m-d_His') . '.zip';
         $zipFilePath = $tempPath . '/' . $zipFileName;
         
-        // Créer le ZIP
         $zip = new ZipArchive();
         
         if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            \Log::error('Cannot create ZIP file');
             return back()->with('error', 'Impossible de créer le fichier ZIP.');
         }
         
         try {
-            // Générer chaque PDF et l'ajouter au ZIP
-            foreach ($bilans as $bilan) {
-                // Générer le PDF en mémoire
+            $successCount = 0;
+            
+            foreach ($bilanIds as $index => $bilanId) {
+                $bilan = BilanMPI::find($bilanId);
+                
+                if (!$bilan) {
+                    \Log::warning("Bilan not found: {$bilanId}");
+                    continue;
+                }
+                
                 $pdf = Pdf::loadView('pdf.bilan-mpi', ['bilan' => $bilan])
                     ->setPaper('a4', 'portrait');
                 
-                // Nom du fichier PDF
                 $pdfFileName = sprintf(
                     'DFP-2023-0814 - Bilan - %s %s.pdf',
                     strtoupper($bilan->nom),
                     ucfirst($bilan->prenom)
                 );
                 
-                // Ajouter le PDF au ZIP
                 $zip->addFromString($pdfFileName, $pdf->output());
+                $successCount++;
+                
+                // Libérer la mémoire tous les 10 bilans
+                if (($index + 1) % 10 === 0) {
+                    gc_collect_cycles();
+                }
             }
             
             $zip->close();
             
-            // Télécharger le ZIP
+            \Log::info('Export completed', [
+                'requested' => count($bilanIds),
+                'successful' => $successCount,
+                'zip_file' => $zipFilePath
+            ]);
+            
             return response()->download($zipFilePath, $zipFileName)->deleteFileAfterSend(true);
             
         } catch (\Exception $e) {
-            $zip->close();
+            if ($zip) {
+                $zip->close();
+            }
             @unlink($zipFilePath);
+            
+            \Log::error('Export failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             
             return back()->with('error', 'Erreur lors de la génération du ZIP : ' . $e->getMessage());
         }
     }
 
     /**
-     * Liste des bilans avec recherche
+     * Liste des bilans avec recherche - PAGINATION 50
      */
     public function index(Request $request)
     {
@@ -413,15 +271,15 @@ class BilanMPIController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nom', 'like', "%{$search}%")
-                    ->orWhere('prenom', 'like', "%{$search}%")
-                    ->orWhere('cip', 'like', "%{$search}%")
-                    ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
-                    ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
+                      ->orWhere('prenom', 'like', "%{$search}%")
+                      ->orWhere('cip', 'like', "%{$search}%")
+                      ->orWhereRaw("CONCAT(nom, ' ', prenom) like ?", ["%{$search}%"])
+                      ->orWhereRaw("CONCAT(prenom, ' ', nom) like ?", ["%{$search}%"]);
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(20)
-            ->withQueryString(); // Important pour garder la recherche dans la pagination
+            ->paginate(50) // 50 bilans par page
+            ->withQueryString();
 
         return Inertia::render('BilanMPI/Index', [
             'bilans' => $bilans,
@@ -429,25 +287,5 @@ class BilanMPIController extends Controller
                 'search' => $search,
             ],
         ]);
-    }
-    /**
-     * Supprimer un bilan
-     */
-    public function destroy(BilanMPI $bilanMpi)
-    {
-        // Vérifier l'autorisation
-        // $this->authorize('delete', $bilanMpi);
-
-        try {
-            $bilanMpi->delete();
-
-            return redirect()->route('bilans-mpi.index')
-                ->with('success', 'Bilan supprimé avec succès !');
-
-        } catch (\Exception $e) {
-            return back()->withErrors([
-                'error' => 'Erreur lors de la suppression : ' . $e->getMessage()
-            ]);
-        }
     }
 }
