@@ -451,7 +451,7 @@
         </div>
     </div>
 
-    <div class="question-block">
+    <div class="question-block" style="margin-bottom:40px;">
         <div class="question-title">
             L'apprenant est-il allé jusqu'au bout des 300 heures . Si oui, précisez ce qu'il a décidé de faire à l'issue de la phase 1 du Dispositif MPI
         </div>
