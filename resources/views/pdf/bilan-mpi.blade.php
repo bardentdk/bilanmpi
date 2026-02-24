@@ -457,7 +457,7 @@
         </div>
         <hr>
         <div class="question-content">
-            L'apprenant est bien allé au bout de ses 300 heures. Il a continué sa phase 2 au sein d'Australe Formation.
+            <!-- L'apprenant est bien allé au bout de ses 300 heures. Il a continué sa phase 2 au sein d'Australe Formation. -->
         </div>
     </div>
 
